@@ -24,44 +24,46 @@ export default function App() {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    console.log("drag");
-
-    // if (e.target.className.includes("column")) {
-    //   const todos = e.target.children;
-    //   const lastChildren = todos[todos.length - 1];
-    //   lastChildren.style.background = "skyblue";
-    // }
-
-    // const placeInfo = e.target.getBoundingClientRect();
-    // const placeY = placeInfo.bottom - e.clientY;
-    // const targetHeight = placeInfo.bottom - placeInfo.top;
-    // setNewPlace(placeY > targetHeight / 2 ? "UP" : "DOWN");
   };
+  // if (e.target.className.includes("column")) {
+  //   const todos = e.target.children;
+  //   const lastChildren = todos[todos.length - 1];
+  //   lastChildren.style.background = "skyblue";
+  // }
+
+  // const placeInfo = e.target.getBoundingClientRect();
+  // const placeY = placeInfo.bottom - e.clientY;
+  // const targetHeight = placeInfo.bottom - placeInfo.top;
+  // setNewPlace(placeY > targetHeight / 2 ? "UP" : "DOWN");
 
   const handleDrop = (e) => {
     e.preventDefault();
+    const droppedPlace = e.target;
     const clickedCardID = e.dataTransfer.getData("card_id");
     const clickedCard = document.getElementById(clickedCardID);
-    clickedCard.style.display = "block";
-
-    const placeInfo = e.target.getBoundingClientRect();
+    const currentColumn = droppedPlace.closest(".cardlist");
+    const placeInfo = droppedPlace.getBoundingClientRect();
     const placeY = placeInfo.bottom - e.clientY;
     const targetHeight = placeInfo.bottom - placeInfo.top;
-    let targetIndex = getNewPlaceIndex(e.target.id);
-    targetIndex = placeY > targetHeight / 2 ? targetIndex - 1 : targetIndex + 1;
+    const insertPlace = placeY > targetHeight / 2 ? "beforebegin" : "afterend";
 
-    function getNewPlaceIndex(id) {
-      const droppedColumn = Array.from(e.target.closest(".column").childNodes);
-      const idArray = droppedColumn.map((el) => el.id);
-      return idArray.indexOf(id);
+    if (droppedPlace === currentColumn) {
+      currentColumn.appendChild(clickedCard);
+    } else {
+      //beforebegin
+      if (insertPlace === "beforebegin")
+        e.target.insertAdjacentElement(insertPlace, clickedCard);
+      //afterend
+      else {
+        if (droppedPlace.nextSibling) {
+          e.target.insertAdjacentElement(insertPlace, clickedCard);
+          // droppedPlace.parentNode.insertBefore(
+          //   clickedCard,
+          //   droppedPlace.nextSibling
+          // );
+        } else currentColumn.appendChild(clickedCard);
+      }
     }
-    const newPlace = e.target.closest(".card") || e.target.closest(".column");
-
-    //처음위치와 달라진 경우
-
-    if (newPlace === e.target.closest(".card"))
-      newPlace.insertAdjacentElement("afterend", clickedCard);
-    else newPlace.appendChild(clickedCard);
   };
 
   return (
@@ -70,7 +72,7 @@ export default function App() {
         <h1>TODO</h1>
         <CardList
           id={"column" + 1}
-          className="column"
+          className="cardlist"
           type="todo"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
@@ -83,7 +85,7 @@ export default function App() {
         <h1>DOING</h1>
         <CardList
           id={"column" + 2}
-          className="column"
+          className="cardlist"
           type="doing"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
@@ -96,7 +98,7 @@ export default function App() {
         <h1>DONE</h1>
         <CardList
           id={"column" + 3}
-          className="column"
+          className="cardlist"
           type="done"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
@@ -110,15 +112,17 @@ export default function App() {
 
 const ColumnBox = styled.div`
   display: flex;
+  gap: 0 10px;
 `;
+
 const Column = styled.div`
   width: 200px;
   background-color: pink;
   padding: 10px;
-  margin-right: 10px;
 `;
 
 const CardList = styled.div`
-  height: 500px;
+  background-color: orange;
   overflow-y: auto;
+  height: 500px;
 `;
