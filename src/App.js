@@ -4,41 +4,64 @@ import Card from "./Card";
 import { datas } from "./datas";
 import styled from "styled-components";
 export default function App() {
+  const [todoFullData, setTodoFullData] = useState(datas);
   const [clickedCardID, setClickedCardID] = useState(null);
+  const [newPlace, setNewPlace] = useState("UP");
   const todoItems = (type) =>
-    datas.map((data) => {
-      if (data.status === type)
-        return (
-          <Card
-            key={data.id}
-            value={data}
-            {...{ clickedCardID, setClickedCardID }}
-          />
-        );
+    todoFullData.map((data) => {
+      return data.status === type ? (
+        <Card
+          key={data.id}
+          value={data}
+          {...{
+            newPlace,
+            clickedCardID,
+            setClickedCardID
+          }}
+        />
+      ) : null;
     });
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    if (e.target.className.includes("column")) {
-      const todos = e.target.children;
-      const lastChildren = todos[todos.length - 1];
-      lastChildren.style.background = "skyblue";
-    }
+    console.log("drag");
+
+    // if (e.target.className.includes("column")) {
+    //   const todos = e.target.children;
+    //   const lastChildren = todos[todos.length - 1];
+    //   lastChildren.style.background = "skyblue";
+    // }
+
+    // const placeInfo = e.target.getBoundingClientRect();
+    // const placeY = placeInfo.bottom - e.clientY;
+    // const targetHeight = placeInfo.bottom - placeInfo.top;
+    // setNewPlace(placeY > targetHeight / 2 ? "UP" : "DOWN");
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
+    const clickedCardID = e.dataTransfer.getData("card_id");
+    const clickedCard = document.getElementById(clickedCardID);
+    clickedCard.style.display = "block";
+
+    const placeInfo = e.target.getBoundingClientRect();
+    const placeY = placeInfo.bottom - e.clientY;
+    const targetHeight = placeInfo.bottom - placeInfo.top;
+    let targetIndex = getNewPlaceIndex(e.target.id);
+    targetIndex = placeY > targetHeight / 2 ? targetIndex - 1 : targetIndex + 1;
+
+    function getNewPlaceIndex(id) {
+      const droppedColumn = Array.from(e.target.closest(".column").childNodes);
+      const idArray = droppedColumn.map((el) => el.id);
+      return idArray.indexOf(id);
+    }
     const newPlace = e.target.closest(".card") || e.target.closest(".column");
-    const card_id = e.dataTransfer.getData("card_id");
-    const card = document.getElementById(card_id);
-    card.style.opacity = 1;
 
-    if (card !== newPlace) card.closest(".column").removeChild(card);
+    //처음위치와 달라진 경우
+
     if (newPlace === e.target.closest(".card"))
-      newPlace.insertAdjacentElement("afterend", card);
-    else newPlace.appendChild(card);
-
-    //drop이후 lastchildren이 있었다면 다시 효과원복
+      newPlace.insertAdjacentElement("afterend", clickedCard);
+    else newPlace.appendChild(clickedCard);
   };
 
   return (
