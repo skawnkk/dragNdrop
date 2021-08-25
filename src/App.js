@@ -16,7 +16,7 @@ export default function App() {
           {...{
             newPlace,
             clickedCardID,
-            setClickedCardID
+            setClickedCardID,
           }}
         />
       ) : null;
@@ -39,31 +39,18 @@ export default function App() {
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedPlace = e.target;
+    const currentColumn = droppedPlace.closest(".cardlist");
+
     const clickedCardID = e.dataTransfer.getData("card_id");
     const clickedCard = document.getElementById(clickedCardID);
-    const currentColumn = droppedPlace.closest(".cardlist");
+
     const placeInfo = droppedPlace.getBoundingClientRect();
     const placeY = placeInfo.bottom - e.clientY;
     const targetHeight = placeInfo.bottom - placeInfo.top;
     const insertPlace = placeY > targetHeight / 2 ? "beforebegin" : "afterend";
 
-    if (droppedPlace === currentColumn) {
-      currentColumn.appendChild(clickedCard);
-    } else {
-      //beforebegin
-      if (insertPlace === "beforebegin")
-        e.target.insertAdjacentElement(insertPlace, clickedCard);
-      //afterend
-      else {
-        if (droppedPlace.nextSibling) {
-          e.target.insertAdjacentElement(insertPlace, clickedCard);
-          // droppedPlace.parentNode.insertBefore(
-          //   clickedCard,
-          //   droppedPlace.nextSibling
-          // );
-        } else currentColumn.appendChild(clickedCard);
-      }
-    }
+    droppedPlace.insertAdjacentElement(insertPlace, clickedCard);
+    console.log("부모", clickedCard.parentNode);
   };
 
   return (
@@ -75,8 +62,7 @@ export default function App() {
           className="cardlist"
           type="todo"
           onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
+          onDrop={handleDrop}>
           {todoItems("todo")}
         </CardList>
       </Column>
@@ -88,8 +74,7 @@ export default function App() {
           className="cardlist"
           type="doing"
           onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
+          onDrop={handleDrop}>
           {todoItems("doing")}
         </CardList>
       </Column>
@@ -101,8 +86,7 @@ export default function App() {
           className="cardlist"
           type="done"
           onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
+          onDrop={handleDrop}>
           {todoItems("done")}
         </CardList>
       </Column>
