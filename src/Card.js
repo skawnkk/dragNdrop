@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
-function Card({ value, clickedCardID, setClickedCardID }) {
+function Card({ item, setClickedCardID }) {
   const [isDragStart, setDragStart] = useState(false);
 
   const handleDragOver = (e) => {
@@ -18,10 +18,8 @@ function Card({ value, clickedCardID, setClickedCardID }) {
   //e.target.style.background = "skyblue";
 
   const handleDragStart = (e) => {
-    e.dataTransfer.setData("card_id", value.id);
-    setClickedCardID(value.id);
+    setClickedCardID(item.id);
     setDragStart(true);
-    //setTimeout(() => (e.target.style.display = "none"), 0);
   };
 
   const handleDragEnd = () => setDragStart(false);
@@ -29,15 +27,15 @@ function Card({ value, clickedCardID, setClickedCardID }) {
   return (
     <>
       <CardWrapper
-        id={value.id}
+        id={item.id}
         className="card"
         isDragStart={isDragStart}
         draggable={true}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}>
-        {value.text}
-        {value.id}
+        {item.text}
+        {item.id}
       </CardWrapper>
     </>
   );

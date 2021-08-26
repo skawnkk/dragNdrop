@@ -1,45 +1,24 @@
 import "./styles.css";
 import { useState } from "react";
+import styled from "styled-components";
 import Card from "./Card";
 import { datas } from "./datas";
-import styled from "styled-components";
+import { STATUS_GROUP } from "./constants";
 export default function App() {
   const [todoFullData, setTodoFullData] = useState(datas);
   const [clickedCardID, setClickedCardID] = useState(null);
+
   const todoItems = (type) =>
     todoFullData.map((data) => {
       return data.status === type ? (
-        <Card
-          key={data.id}
-          value={data}
-          {...{
-            clickedCardID,
-            setClickedCardID,
-          }}
-        />
+        <Card key={data.id} item={data} setClickedCardID={setClickedCardID} />
       ) : null;
     });
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-  // if (e.target.className.includes("column")) {
-  //   const todos = e.target.children;
-  //   const lastChildren = todos[todos.length - 1];
-  //   lastChildren.style.background = "skyblue";
-  // }
-
-  // const placeInfo = e.target.getBoundingClientRect();
-  // const placeY = placeInfo.bottom - e.clientY;
-  // const targetHeight = placeInfo.bottom - placeInfo.top;
-  // setNewPlace(placeY > targetHeight / 2 ? "UP" : "DOWN");
 
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedPlace = e.target;
     const currentColumn = droppedPlace.closest(".cardlist");
-
-    const clickedCardID = e.dataTransfer.getData("card_id");
     const clickedCard = document.getElementById(clickedCardID);
 
     if (e.target === currentColumn) currentColumn.appendChild(clickedCard);
@@ -53,43 +32,20 @@ export default function App() {
     }
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+  const title = (status) => status.toUpperCase();
   return (
     <ColumnBox>
-      <Column>
-        <h1>TODO</h1>
-        <CardList
-          id={"column" + 1}
-          className="cardlist"
-          type="todo"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}>
-          {todoItems("todo")}
-        </CardList>
-      </Column>
-
-      <Column>
-        <h1>DOING</h1>
-        <CardList
-          id={"column" + 2}
-          className="cardlist"
-          type="doing"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}>
-          {todoItems("doing")}
-        </CardList>
-      </Column>
-
-      <Column>
-        <h1>DONE</h1>
-        <CardList
-          id={"column" + 3}
-          className="cardlist"
-          type="done"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}>
-          {todoItems("done")}
-        </CardList>
-      </Column>
+      {STATUS_GROUP.map((status, idx) => (
+        <Column key={idx} id={`column${idx}`}>
+          <h1>{title(status)}</h1>
+          <CardList className="cardlist" onDragOver={handleDragOver} onDrop={handleDrop}>
+            {todoItems(status)}
+          </CardList>
+        </Column>
+      ))}
     </ColumnBox>
   );
 }
@@ -104,6 +60,9 @@ const Column = styled.div`
   width: 200px;
   background-color: pink;
   padding: 10px;
+  h1 {
+    text-align: center;
+  }
 `;
 
 const CardList = styled.div`

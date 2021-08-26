@@ -9,5 +9,5 @@ export const datas = [
   { id: 8, text: "헬로", status: "doing" },
   { id: 9, text: "헬로", status: "done" },
   { id: 10, text: "헬로", status: "todo" },
-  { id: 11, text: "헬로", status: "todo" }
+  { id: 11, text: "헬로", status: "todo" },
 ];
