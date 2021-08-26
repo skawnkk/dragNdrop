@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { useState } from "react";
-function Card({ item, setClickedCardID }) {
+import { useState, useEffect } from "react";
+function Card({ item, clickedCardID, setClickedCardID, markupUpper, enteredCardID }) {
   const [isDragStart, setDragStart] = useState(false);
 
   const handleDragOver = (e) => {
@@ -23,9 +23,12 @@ function Card({ item, setClickedCardID }) {
   };
 
   const handleDragEnd = () => setDragStart(false);
-
+  const showLine = () => {
+    return enteredCardID === item.id && isDragStart;
+  };
   return (
     <>
+      {showLine() && markupUpper && <DroppablePlace />}
       <CardWrapper
         id={item.id}
         className="card"
@@ -33,24 +36,26 @@ function Card({ item, setClickedCardID }) {
         draggable={true}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}>
+        onDragEnd={handleDragEnd}
+        markupUpper={markupUpper}>
         {item.text}
         {item.id}
       </CardWrapper>
+      {showLine() && !markupUpper && <DroppablePlace />}
     </>
   );
 }
 export default Card;
 const CardWrapper = styled.div`
-  height: 50px;
-  margin-bottom: 5px;
+  border-top: ${(props) => (props.markupUpper ? `3px solid skyblue` : `none`)};
+  border-bottom: ${(props) => (props.markupUpper ? `3px solid skyblue` : `none`)};
   border: 1px solid black;
-  background-color: white;
   opacity: ${(props) => (props.isDragStart ? 0.5 : 1)};
+  height: 50px;
+  background-color: white;
 `;
 
-const NewPlaceMarking = styled.div`
+const DroppablePlace = styled.div`
   height: 3px;
-  padding: 1px 0;
   background-color: aquamarine;
 `;

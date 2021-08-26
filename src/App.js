@@ -4,38 +4,44 @@ import styled from "styled-components";
 import Card from "./Card";
 import { datas } from "./datas";
 import { STATUS_GROUP } from "./constants";
+import { getInsertPlace } from "./util/function";
 export default function App() {
   const [todoFullData, setTodoFullData] = useState(datas);
+  const [markupUpper, setMarkupUpper] = useState(false);
+  const [enteredCardID, setEnteredCardID] = useState(null);
   const [clickedCardID, setClickedCardID] = useState(null);
 
   const todoItems = (type) =>
     todoFullData.map((data) => {
       return data.status === type ? (
-        <Card key={data.id} item={data} setClickedCardID={setClickedCardID} />
+        <Card
+          key={data.id}
+          item={data}
+          clickedCardID={clickedCardID}
+          setClickedCardID={setClickedCardID}
+          markupUpper={markupUpper}
+          enteredCardID={enteredCardID}
+        />
       ) : null;
     });
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const droppedPlace = e.target;
-    const currentColumn = droppedPlace.closest(".cardlist");
+    const currentColumn = e.target.closest(".cardlist");
     const clickedCard = document.getElementById(clickedCardID);
 
     if (e.target === currentColumn) currentColumn.appendChild(clickedCard);
-    else {
-      const placeInfo = droppedPlace.getBoundingClientRect();
-      const placeY = placeInfo.bottom - e.clientY;
-      const targetHeight = placeInfo.bottom - placeInfo.top;
-      const insertPlace = placeY > targetHeight / 2 ? "beforebegin" : "afterend";
-
-      droppedPlace.insertAdjacentElement(insertPlace, clickedCard);
-    }
+    else e.target.insertAdjacentElement(getInsertPlace(e), clickedCard);
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
+    getInsertPlace(e) === "beforebegin" ? setMarkupUpper(true) : setMarkupUpper(false);
+    setEnteredCardID(e.target.id ? +e.target.id : null);
   };
+
   const title = (status) => status.toUpperCase();
+
   return (
     <ColumnBox>
       {STATUS_GROUP.map((status, idx) => (
