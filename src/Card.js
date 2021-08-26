@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
-function Card({ value, newPlace, clickedCardID, setClickedCardID }) {
+function Card({ value, clickedCardID, setClickedCardID }) {
   const [isDragStart, setDragStart] = useState(false);
 
   const handleDragOver = (e) => {
@@ -19,7 +19,7 @@ function Card({ value, newPlace, clickedCardID, setClickedCardID }) {
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData("card_id", value.id);
-    setClickedCardID(value.id); //?필요한건가
+    setClickedCardID(value.id);
     setDragStart(true);
     //setTimeout(() => (e.target.style.display = "none"), 0);
   };
@@ -28,9 +28,6 @@ function Card({ value, newPlace, clickedCardID, setClickedCardID }) {
 
   return (
     <>
-      {newPlace === "UP" && isDragStart && (
-        <NewPlaceMarking>내용</NewPlaceMarking>
-      )}
       <CardWrapper
         id={value.id}
         className="card"
@@ -38,15 +35,10 @@ function Card({ value, newPlace, clickedCardID, setClickedCardID }) {
         draggable={true}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
+        onDragEnd={handleDragEnd}>
         {value.text}
         {value.id}
       </CardWrapper>
-
-      {newPlace === "DOWN" && isDragStart && (
-        <NewPlaceMarking>내용</NewPlaceMarking>
-      )}
     </>
   );
 }

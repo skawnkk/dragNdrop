@@ -6,7 +6,6 @@ import styled from "styled-components";
 export default function App() {
   const [todoFullData, setTodoFullData] = useState(datas);
   const [clickedCardID, setClickedCardID] = useState(null);
-  const [newPlace, setNewPlace] = useState("UP");
   const todoItems = (type) =>
     todoFullData.map((data) => {
       return data.status === type ? (
@@ -14,7 +13,6 @@ export default function App() {
           key={data.id}
           value={data}
           {...{
-            newPlace,
             clickedCardID,
             setClickedCardID,
           }}
@@ -44,13 +42,15 @@ export default function App() {
     const clickedCardID = e.dataTransfer.getData("card_id");
     const clickedCard = document.getElementById(clickedCardID);
 
-    const placeInfo = droppedPlace.getBoundingClientRect();
-    const placeY = placeInfo.bottom - e.clientY;
-    const targetHeight = placeInfo.bottom - placeInfo.top;
-    const insertPlace = placeY > targetHeight / 2 ? "beforebegin" : "afterend";
+    if (e.target === currentColumn) currentColumn.appendChild(clickedCard);
+    else {
+      const placeInfo = droppedPlace.getBoundingClientRect();
+      const placeY = placeInfo.bottom - e.clientY;
+      const targetHeight = placeInfo.bottom - placeInfo.top;
+      const insertPlace = placeY > targetHeight / 2 ? "beforebegin" : "afterend";
 
-    droppedPlace.insertAdjacentElement(insertPlace, clickedCard);
-    console.log("부모", clickedCard.parentNode);
+      droppedPlace.insertAdjacentElement(insertPlace, clickedCard);
+    }
   };
 
   return (
@@ -96,6 +96,7 @@ export default function App() {
 
 const ColumnBox = styled.div`
   display: flex;
+  height: 500px;
   gap: 0 10px;
 `;
 
@@ -107,6 +108,6 @@ const Column = styled.div`
 
 const CardList = styled.div`
   background-color: orange;
+  height: 400px;
   overflow-y: auto;
-  height: 500px;
 `;
